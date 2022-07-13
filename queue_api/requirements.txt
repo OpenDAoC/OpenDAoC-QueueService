@@ -1,5 +1,8 @@
 flask-cors
 flask-restful
 flask-sqlalchemy
+flask-marshmallow
 flask~=1.1.4
+gunicorn
+marshmallow
 setuptools~=58.2.0
