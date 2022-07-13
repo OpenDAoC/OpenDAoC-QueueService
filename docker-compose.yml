@@ -44,7 +44,7 @@ services:
     ports:
       - "3306"
 
-  nginx:
+  queue_nginx:
     image: queue_nginx
     container_name: queue_nginx
     build:
