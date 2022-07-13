@@ -28,6 +28,8 @@ services:
     environment:
       - QUEUE_INTERNAL_SECRET
       - QUEUE_API_HOST=${QUEUE_API_HOST-http://queue_api:8080}
+      - GAME_SERVER_SECRET
+      - MAX_PLAYERS
 
   mysql:
     image: mysql
