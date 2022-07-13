@@ -1,4 +1,5 @@
 import atexit
+import time
 from enum import Enum
 
 import requests as requests
@@ -29,7 +30,9 @@ def secure_headers():
 # Get dictionary of all connected clients from game server (account_name : client_details)
 def get_current_clients():
     r = requests.get(url=api_urls["game_server_clients"])
-    return r.json()
+    if r.status_code != 200:
+        return r.text, r.status_code
+    return r.json(), r.status_code
 
 
 # Get list of size @length of accounts at the front of the queue
@@ -38,13 +41,17 @@ def get_queue(length: int):
         "length": length
     }
     r = requests.get(url=api_urls["queue"], params=params, headers=secure_headers())
-    return r.json()
+    if r.status_code != 200:
+        return r.text, r.status_code
+    return r.json(), r.status_code
 
 
 # retrieve the whole whitelist
 def get_whitelist():
     r = requests.get(url=api_urls["whitelist"], headers=secure_headers())
-    return r.json()
+    if r.status_code != 200:
+        return r.text, r.status_code
+    return r.json(), r.status_code
 
 
 # add an account to the whitelist
@@ -53,7 +60,9 @@ def add_to_whitelist(account: str):
         "name": account
     }
     r = requests.post(url=api_urls["whitelist"], data=data, headers=secure_headers())
-    return r.json()
+    if r.status_code != 200:
+        return r.text, r.status_code
+    return r.json(), r.status_code
 
 
 # remove an account from the whitelist
@@ -62,12 +71,17 @@ def remove_from_whitelist(account: str):
         "name": account
     }
     r = requests.delete(url=api_urls["whitelist"], data=data, headers=secure_headers())
-    return r.json()
+    if r.status_code != 200:
+        return r.text, r.status_code
+    return r.json(), r.status_code
 
 
 def process_queue():
+    clients, status_code = get_current_clients()
+    if status_code != 200:
+        print('oh shit game server kill?', clients, status_code, flush=True)
+        return
 
-    clients = get_current_clients()
     total_states = {
         "connecting": 0,
         "charscreen": 0,
@@ -78,23 +92,23 @@ def process_queue():
     }
 
     total_team = 0
-    for k, v in clients.items():
-        print(k, v)
-        if v['privLevel'] == 2 or v['privLevel'] == 3:
+    for k in list(clients.keys()):
+        client = clients[k]
+        if client['privLevel'] == 2 or client['privLevel'] == 3:
             total_team += 1
-            del clients[k]
+            del client[k]
             continue
-        if v["state"] == 1:
+        if client["state"] == 1:
             total_states['connecting'] += 1
-        elif v["state"] == 2:
+        elif client["state"] == 2:
             total_states['charscreen'] += 1
-        elif v["state"] == 3:
+        elif client["state"] == 3:
             total_states['worldenter'] += 1
-        elif v["state"] == 4:
+        elif client["state"] == 4:
             total_states['playing'] += 1
-        elif v["state"] == 5:
+        elif client["state"] == 5:
             total_states['linkdead'] += 1
-        elif v["state"] == 6:
+        elif client["state"] == 6:
             total_states['disconnected'] += 1
 
     total_clients = len(clients.keys())
@@ -105,17 +119,20 @@ def process_queue():
     print('current player cap:', MAX_PLAYERS)
     print('open slots: ', MAX_PLAYERS - player_count)
     print('client state breakdown:', total_states)
+    print('sleeping for 10 seconds...', flush=True)
     return
 
 
-def shutdown():
-    return
-
-
-sched = BackgroundScheduler(daemon=True)
-sched.add_job(process_queue, 'interval', seconds=30)
+sched = BackgroundScheduler()
+sched.add_job(process_queue, 'interval', seconds=10)
 sched.start()
-atexit.register(lambda: shutdown)
+atexit.register(lambda: sched.shutdown(wait=False))
+
+
+def main():
+    while True:
+        time.sleep(1)
+
 
 if __name__ == "__main__":
-    process_queue()
+    main()
