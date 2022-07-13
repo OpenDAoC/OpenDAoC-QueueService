@@ -1,0 +1,43 @@
+version: "3.1"
+services:
+  queue_api:
+    container_name: queue_api
+    image: queue_api
+    build:
+      context: ./queue_api
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - ATLAS_DB_NAME
+      - ATLAS_DB_USER
+      - ATLAS_DB_PASS
+      - ATLAS_DB_HOST
+      - ATLAS_DB_PORT
+      - QUEUE_INTERNAL_SECRET
+      - GAME_SERVER_SECRET
+    ports:
+      - "8080:8080"
+
+  queue_service:
+    container_name: queue_service
+    image: queue_service
+    build:
+      context: ./queue_service
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - QUEUE_INTERNAL_SECRET
+      - QUEUE_API_HOST=${QUEUE_API_HOST-http://queue_api:8080}
+
+  mysql:
+    image: mysql
+    container_name: queue_db
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=queue
+      - MYSQL_ROOT_PASSWORD=queuerootpassword
+      - MYSQL_USER=queue
+      - MYSQL_PASSWORD=queue
+    ports:
+      - "3306"
