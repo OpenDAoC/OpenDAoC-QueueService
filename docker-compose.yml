@@ -43,3 +43,13 @@ services:
       - MYSQL_PASSWORD=queue
     ports:
       - "3306"
+
+  nginx:
+    image: queue_nginx
+    container_name: queue_nginx
+    build:
+      context: ./queue_nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
