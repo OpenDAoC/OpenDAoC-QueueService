@@ -96,7 +96,7 @@ def process_queue():
         client = clients[k]
         if client['privLevel'] == 2 or client['privLevel'] == 3:
             total_team += 1
-            del client[k]
+            del clients[k]
             continue
         if client["state"] == 1:
             total_states['connecting'] += 1

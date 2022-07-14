@@ -8,12 +8,10 @@ RUN apt-get update && \
 #    update-alternatives -- install /usr/bin/python3 python3 /user/bin/python3.8 1
 
 RUN apt-get install -y \
-    git
-#    build-essential cargo
-#    libpq-dev python3.8-dev \
-#    python3-pip \
+    python3-dev default-libmysqlclient-dev \
+    build-essential cargo
 
-COPY queue_api /root/queue_api
+COPY queue_api /root/queue_api/queue_api
 COPY setup.py /root/
 COPY requirements.txt /root/
 COPY install.sh /root/
@@ -25,10 +23,10 @@ RUN ./install.sh
 RUN mkdir -p /var/log/gunicorn
 
 CMD gunicorn -w 2 \
-    --bind 0.0.0.0:8080 \
+    --bind 0.0.0.0:5000 \
     --error-logfile /var/log/gunicorn/error.log \
     --access-logfile /var/log/gunicorn/access.log \
     --capture-output \
     --log-level debug \
     --timeout 300 \
-    "queue_api.app:create_app()"
+    "queue_api.queue_api.app:app"

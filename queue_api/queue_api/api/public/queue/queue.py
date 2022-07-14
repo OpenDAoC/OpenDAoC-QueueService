@@ -1,13 +1,18 @@
+import traceback
+
 from flask import request, jsonify
 from flask_restful import Resource
 from sqlalchemy import text
 
-from queue_api.queue_api.db.database import db
+from queue_api.queue_api.db.database import db, DATABASE_URL
 from queue_api.queue_api.db.models.queue import QueueEntries
 
 
 class PublicQueue(Resource):
     def get(self):
+        return {'success': True, 'queue_length': 0}, 200
+
+    def post(self):
         data = request.get_json()
         try:
             account = data["account"]
@@ -18,8 +23,5 @@ class PublicQueue(Resource):
             query = text("""SELECT COUNT(1) FROM tbl WHERE create_date <= :create_date""")
             result = db.engine.execute(query, **payload)
         except Exception as e:
-            return {'success': False, 'error': str(e)}, 500
+            return {'success': False, 'error': str(traceback.format_exc()), 'db_uri': DATABASE_URL}, 500
         return {'success': True, 'position': result}, 200
-
-    def post(self):
-        return

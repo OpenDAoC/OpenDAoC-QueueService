@@ -1,6 +1,6 @@
-import CORS as CORS
 from flask import Blueprint
 from flask_restful import Api
+from flask_cors import CORS
 
 from queue_api.queue_api.api.internal.queue import InternalQueue
 from queue_api.queue_api.api.internal.whitelist import InternalWhitelist

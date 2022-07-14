@@ -1,7 +1,7 @@
 import sqlalchemy as db
 from sqlalchemy.dialects.mysql import VARCHAR
 
-from base import QueueBase
+from queue_api.queue_api.db.models.base import QueueBase
 
 
 class QueueEntries(QueueBase):
