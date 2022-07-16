@@ -10,6 +10,11 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
+      - QUEUE_DB_NAME
+      - QUEUE_DB_USER
+      - QUEUE_DB_PASS
+      - QUEUE_DB_HOST
+      - QUEUE_DB_PORT
       - ATLAS_DB_NAME
       - ATLAS_DB_USER
       - ATLAS_DB_PASS
@@ -33,6 +38,7 @@ services:
       - QUEUE_INTERNAL_SECRET
       - QUEUE_API_HOST=${QUEUE_API_HOST-http://queue_api:8080}
       - GAME_SERVER_SECRET
+      - GAME_SERVER_API_HOST
       - MAX_PLAYERS
 
   queue_db:

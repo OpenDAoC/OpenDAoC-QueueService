@@ -1,15 +1,19 @@
 import atexit
+import parser
 import time
+from datetime import datetime, timedelta
 from enum import Enum
 
 import requests as requests
 from apscheduler.schedulers.background import BackgroundScheduler
+from dateutil import parser
+
 from credentials import *
 
 api_urls = {
-    "game_server_clients": f"https://api.atlasfreeshard.com/utils/query_clients/{GAME_SERVER_SECRET}",
-    "queue": f"http://{QUEUE_API_HOST}/api/v1/internal/queue",
-    "whitelist": f"http://{QUEUE_API_HOST}/api/v1/internal/whitelist"
+    "game_server_clients": f"{GAME_SERVER_API_HOST}/utils/query_clients/{GAME_SERVER_SECRET}",
+    "queue": f"{QUEUE_API_HOST}/api/v1/internal/queue",
+    "whitelist": f"{QUEUE_API_HOST}/api/v1/internal/whitelist"
 }
 
 
