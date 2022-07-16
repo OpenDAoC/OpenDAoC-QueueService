@@ -66,7 +66,7 @@ services:
       context: ./queue_nginx
       dockerfile: Dockerfile
     volumes:
-      - /etc/letsencrypt/live/queue.atlasfreeshard.com/:/etc/letsencrypt/live/queue.atlasfreeshard.com/
+      - /etc/letsencrypt/:/etc/letsencrypt/:ro
     tty: true
     ports:
       - "80:80"
