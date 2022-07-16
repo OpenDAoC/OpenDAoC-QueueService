@@ -10,7 +10,11 @@ from queue_api.queue_api.db.models.queue import QueueEntries
 
 class PublicQueue(Resource):
     def get(self):
-        return {'success': True, 'queue_length': 0}, 200
+        query = text(
+            """SELECT COUNT(1) FROM queue_entries WHERE whitelisted IS NOT TRUE""")
+        result = db.engine.execute(query).first()
+        queue_length = result[0]
+        return {'success': True, 'queue_length': queue_length}, 200
 
     # GET QUEUE POSITION
     def post(self):
@@ -21,7 +25,7 @@ class PublicQueue(Resource):
             if status != 200:
                 return position, status
         except Exception as e:
-            return {'success': False, 'position': -1, 'error': str(traceback.format_exc())}, 500
+            return {'success': False, 'position': -1, 'error': str(e)}, 500
         return {'success': True, 'position': position}, 200
 
 
