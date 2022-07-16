@@ -20,14 +20,7 @@ USE `queue`;
 -- Dumping structure for table queue.queue_entries
 CREATE TABLE IF NOT EXISTS `queue_entries` (
   `name` varchar(255) NOT NULL,
-  `date_create` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
--- Dumping structure for table queue.whitelist_entries
-CREATE TABLE IF NOT EXISTS `whitelist_entries` (
-  `name` varchar(255) NOT NULL,
+  `whitelisted` BOOL NOT NULL DEFAULT '0',
   `date_create` datetime NOT NULL DEFAULT current_timestamp(),
   `date_revoke` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
