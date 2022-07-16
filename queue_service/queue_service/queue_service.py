@@ -11,6 +11,7 @@ from dateutil import parser
 from credentials import *
 
 api_urls = {
+    "game_server_max_clients": f"{GAME_SERVER_API_HOST}/utils/query_max_cap",
     "game_server_clients": f"{GAME_SERVER_API_HOST}/utils/query_clients/{GAME_SERVER_SECRET}",
     "queue": f"{QUEUE_API_HOST}/api/v1/internal/queue",
     "whitelist": f"{QUEUE_API_HOST}/api/v1/internal/whitelist"
@@ -32,6 +33,14 @@ class playerState(Enum):
 
 def secure_headers():
     return {"Authorization": QUEUE_INTERNAL_SECRET}
+
+
+# Get max_players cap from game server
+def get_max_clients_count():
+    r = requests.get(url=api_urls["game_server_max_clients"])
+    if r.status_code != 200:
+        return r.text, r.status_code
+    return r.json(), r.status_code
 
 
 # Get dictionary of all connected clients from game server (account_name : client_details)
@@ -108,6 +117,14 @@ def remove_from_whitelist(account_list: list):
 
 
 def process_queue():
+
+    max_players_response, status_code = get_max_clients_count()
+    if status_code != 200:
+        print('get_max_clients_count', max_players_response, status_code, flush=True)
+        return
+    else:
+        MAX_PLAYERS = max_players_response["max_players"]
+
     clients, status_code = get_current_clients()
     if status_code != 200:
         print('get_current_clients', clients, status_code, flush=True)
