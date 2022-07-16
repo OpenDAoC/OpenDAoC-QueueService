@@ -143,6 +143,7 @@ def process_queue():
     total_clients = len(clients.keys())
     player_count = total_clients - total_team
     available_slots = MAX_PLAYERS - player_count
+    available_slots = available_slots if available_slots >= 0 else 0
 
     request_whitelisted_players, status = get_whitelist()
     if status != 200:
