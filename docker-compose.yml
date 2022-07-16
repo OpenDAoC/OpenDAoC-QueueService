@@ -18,7 +18,7 @@ services:
       - QUEUE_INTERNAL_SECRET
       - GAME_SERVER_SECRET
     ports:
-      - "5000:5000"
+      - "8080:8080"
 
   queue_service:
     depends_on:
@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
     environment:
       - QUEUE_INTERNAL_SECRET
-      - QUEUE_API_HOST=${QUEUE_API_HOST-http://queue_api:5000}
+      - QUEUE_API_HOST=${QUEUE_API_HOST-http://queue_api:8080}
       - GAME_SERVER_SECRET
       - MAX_PLAYERS
 
