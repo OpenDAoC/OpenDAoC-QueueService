@@ -142,6 +142,7 @@ def process_queue():
 
     total_clients = len(clients.keys())
     player_count = total_clients - total_team
+    player_count = player_count if player_count >= 0 else 0
     available_slots = MAX_PLAYERS - player_count
     available_slots = available_slots if available_slots >= 0 else 0
 
