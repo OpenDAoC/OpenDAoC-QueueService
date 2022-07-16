@@ -1,4 +1,4 @@
-FROM python:3.10-bullseye
+FROM python:3.9-bullseye
 RUN apt-get update && \
     apt install software-properties-common -y && \
     add-apt-repository ppa:deadsnakes/ppa
@@ -8,12 +8,10 @@ RUN apt-get update && \
 #    update-alternatives -- install /usr/bin/python3 python3 /user/bin/python3.8 1
 
 RUN apt-get install -y \
-    git
-#    build-essential cargo
-#    libpq-dev python3.8-dev \
-#    python3-pip \
+    python3-dev default-libmysqlclient-dev \
+    build-essential cargo
 
-COPY queue_api /root/queue_api
+COPY queue_api /root/queue_api/queue_api
 COPY setup.py /root/
 COPY requirements.txt /root/
 COPY install.sh /root/
@@ -31,4 +29,4 @@ CMD gunicorn -w 2 \
     --capture-output \
     --log-level debug \
     --timeout 300 \
-    "queue_api.app:create_app()"
+    "queue_api.queue_api.app:app"

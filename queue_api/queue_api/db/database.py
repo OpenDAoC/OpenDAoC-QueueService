@@ -9,7 +9,7 @@ from ..credentials import (
     QUEUE_DB_NAME
 )
 
-DATABASE_URL = (
+QUEUE_DATABASE_URL = (
     f'mysql://{QUEUE_DB_USER}:{QUEUE_DB_PASS}@{QUEUE_DB_HOST}:{QUEUE_DB_PORT}/{QUEUE_DB_NAME}'
 )
 
