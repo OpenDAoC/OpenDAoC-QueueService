@@ -16,6 +16,9 @@ api_urls = {
     "whitelist": f"{QUEUE_API_HOST}/api/v1/internal/whitelist"
 }
 
+print(GAME_SERVER_API_HOST)
+print(QUEUE_API_HOST, flush=True)
+
 
 # this enum is pointless unless we are going to track charscreen count & boot AFK
 class playerState(Enum):
