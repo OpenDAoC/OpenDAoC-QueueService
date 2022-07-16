@@ -34,7 +34,7 @@ class QueueJoin(Resource):
             hashed_password = "##" + hashed
             game_server_session = atlas_session()
             payload = {"name": name, "password": hashed_password}
-            query = text("""SELECT name, privlevel FROM account WHERE name=:name AND password=:password""")
+            query = text("""SELECT name, privlevel, discordid FROM account WHERE name=:name AND password=:password""")
             res = game_server_session.execute(query, payload)
             account = res.first()
 
