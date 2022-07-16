@@ -41,6 +41,8 @@ class QueueJoin(Resource):
             # account = Account.query.filter_by(name=name, password=hashed_password).first()
             if account is None:
                 return {'success': False, 'error': 'an account with this user/pass combination does not exist'}, 401
+            if account.discordid is None:
+                return {'success': False, 'error': 'this account is not associated with a discord id'}, 403
             if account.privlevel > 1:
                 return {'success': True, 'queue_bypass': True, 'queued': False, 'whitelisted': False}, 200
             if QueueEntries.query.filter_by(name=account.name, whitelisted=True).first():
@@ -55,5 +57,5 @@ class QueueJoin(Resource):
             if status != 200:
                 return position, status
         except Exception as e:
-            return {'success': False, 'error': str(e), "queue_db_uri": QUEUE_DATABASE_URL, "atlas_db_uri": ATLAS_DATABASE_URL}, 400
+            return {'success': False, 'error': str(e)}, 400
         return {'success': True, 'queued': True, 'position': position}, 200
