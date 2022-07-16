@@ -6,6 +6,9 @@ Base = declarative_base()
 
 
 class QueueBase(Base):
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     __abstract__ = True
 
     date_create = db.Column(
