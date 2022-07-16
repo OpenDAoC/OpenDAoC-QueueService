@@ -22,7 +22,7 @@ def health_check():
 
 api.add_resource(PublicQueue, "/queue")
 api.add_resource(QueueJoin, "/queue/join")
-api.add_resource(PublicWhitelist, "/whitelist")
+api.add_resource(PublicWhitelist, "/whitelist/check")
 
 api.add_resource(InternalQueue, "/internal/queue")
 api.add_resource(InternalWhitelist, "/internal/whitelist")
