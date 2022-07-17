@@ -20,4 +20,4 @@ class PublicWhitelist(Resource):
             status_code = 200 if query is not None else 404
         except Exception as e:
             return {'success': False, 'position': -1, 'error': str(e)}, 500
-        return {'success': True}, status_code
+        return {'success': query is not None}, status_code
