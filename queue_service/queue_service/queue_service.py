@@ -13,6 +13,7 @@ from credentials import *
 api_urls = {
     "game_server_max_clients": f"{GAME_SERVER_API_HOST}/utils/query_max_cap",
     "game_server_clients": f"{GAME_SERVER_API_HOST}/utils/query_clients/{GAME_SERVER_SECRET}",
+    "queue_length": f"{QUEUE_API_HOST}/api/v1/queue",
     "queue": f"{QUEUE_API_HOST}/api/v1/internal/queue",
     "whitelist": f"{QUEUE_API_HOST}/api/v1/internal/whitelist"
 }
@@ -46,6 +47,14 @@ def get_max_clients_count():
 # Get dictionary of all connected clients from game server (account_name : client_details)
 def get_current_clients():
     r = requests.get(url=api_urls["game_server_clients"])
+    if r.status_code != 200:
+        return r.text, r.status_code
+    return r.json(), r.status_code
+
+
+# Get max_players cap from game server
+def get_queue_length():
+    r = requests.get(url=api_urls["queue_length"])
     if r.status_code != 200:
         return r.text, r.status_code
     return r.json(), r.status_code
@@ -130,27 +139,24 @@ def process_queue():
         print('get_current_clients', clients, status_code, flush=True)
         return
 
-    total_clients = len(clients.keys())
-    total_clients_bypassing = 0
-    for k in list(clients.keys()):
-        client = clients[k]
-        if client['privLevel'] > 1 or client['isTester'] == 1:
-            total_clients_bypassing += 1
-            del clients[k]
-            continue
-        if client["state"] == 6:  # disconnected
-            del clients[k]
-
-    player_count = total_clients - total_clients_bypassing
-    player_count = player_count if player_count >= 0 else 0
-    available_slots = MAX_PLAYERS - player_count
-    available_slots = available_slots if available_slots >= 0 else 0
+    print(clients, flush=True)
 
     request_whitelisted_players, status = get_whitelist()
     if status != 200:
         print('get_whitelist', status_code, request_whitelisted_players, flush=True)
         return
     whitelisted_players = request_whitelisted_players['users']
+
+    total_clients = len(clients.keys())
+    total_clients_bypassing = 0
+    for k in list(clients.keys()):
+        client = clients[k]
+        if client['privLevel'] > 1 or client['isTester'] is True:
+            total_clients_bypassing += 1
+            del clients[k]
+            continue
+        if client["state"] == 6:  # disconnected
+            del clients[k]
 
     date_now = datetime.now()
     revoke_time = date_now + timedelta(minutes=1)
@@ -160,19 +166,21 @@ def process_queue():
     accounts_need_revoke_date = []
     accounts_to_revoke = []
 
-    for x in whitelisted_players:
-        if x["name"] not in connected_client_name_list:
-            if x.get('date_revoke', None) is None:
+    for k in list(whitelisted_players.keys()):
+        client = whitelisted_players[k]
+        if client["name"] not in connected_client_name_list:
+            if client.get('date_revoke', None) is None:
                 accounts_need_revoke_date.append({
-                    "name": x["name"],
+                    "name": client["name"],
                     "date_revoke": revoke_time.isoformat()
                 })
             else:
-                user_revoke_date = parser.parse(x["date_revoke"])
+                user_revoke_date = parser.parse(client["date_revoke"])
                 if date_now >= user_revoke_date:
-                    accounts_to_revoke.append(x["name"])
-        elif x["date_revoke"] is not None and x["name"] in connected_client_name_list:
-            accounts_reconnected_during_grace.append(x["name"])
+                    accounts_to_revoke.append(client["name"])
+                    del whitelisted_players[k]
+        elif client["date_revoke"] is not None and client["name"] in connected_client_name_list:
+            accounts_reconnected_during_grace.append(client["name"])
 
     removed_revoke_date, status_code = remove_revoke_date_from_whitelist(accounts_reconnected_during_grace)
     if status_code != 200:
@@ -189,6 +197,18 @@ def process_queue():
         print('remove_from_whitelist', status_code, revoked_accounts, flush=True)
         return
 
+    whitelisted_count = len(whitelisted_players.keys())
+    player_count = total_clients - total_clients_bypassing
+    real_client_count = player_count if player_count >= 0 else 0
+    available_slots = MAX_PLAYERS - whitelisted_count
+    available_slots = available_slots if available_slots >= 0 else 0
+
+    queue_length_response, status_code = get_queue_length()
+    if status_code != 200:
+        print('get_queue_length', status_code, queue_length_response, flush=True)
+        return
+    queue_length = queue_length_response["queue_length"]
+
     players_next_in_line, status_code = get_queue(available_slots)
     if status_code != 200:
         print('get_queue', status_code, players_next_in_line, flush=True)
@@ -202,11 +222,14 @@ def process_queue():
         else:
             successfully_whitelisted_count += 1
 
-    print('total clients:', total_clients)
-    print('total queue bypassing clients:', total_clients_bypassing)
-    print('total player clients:', player_count)
-    print('current player cap:', MAX_PLAYERS)
-    print('open slots: ', available_slots)
+    print(date_now.isoformat())
+    print('game_server: total clients:', total_clients)
+    print('game_server: total queue bypassing clients:', total_clients_bypassing)
+    print('game_server: total player clients:', player_count)
+    print('game_server: current player cap:', MAX_PLAYERS)
+    print('queue: total in queue: ', queue_length)
+    print('queue: open slots: ', available_slots)
+    print('queue: total whitelisted: ', whitelisted_count)
     print(f'whitelisted {successfully_whitelisted_count} users from: ', players_next_in_line)
     print('accounts given grace: ', accounts_reconnected_during_grace)
     print('accounts primed to revoke: ', accounts_need_revoke_date)
