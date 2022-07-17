@@ -166,8 +166,8 @@ def process_queue():
     accounts_need_revoke_date = []
     accounts_to_revoke = []
 
-    for k in list(whitelisted_players.keys()):
-        client = whitelisted_players[k]
+    removed_whitelist_count = 0
+    for client in whitelisted_players:
         if client["name"] not in connected_client_name_list:
             if client.get('date_revoke', None) is None:
                 accounts_need_revoke_date.append({
@@ -178,7 +178,7 @@ def process_queue():
                 user_revoke_date = parser.parse(client["date_revoke"])
                 if date_now >= user_revoke_date:
                     accounts_to_revoke.append(client["name"])
-                    del whitelisted_players[k]
+                    removed_whitelist_count += 1
         elif client["date_revoke"] is not None and client["name"] in connected_client_name_list:
             accounts_reconnected_during_grace.append(client["name"])
 
@@ -197,7 +197,7 @@ def process_queue():
         print('remove_from_whitelist', status_code, revoked_accounts, flush=True)
         return
 
-    whitelisted_count = len(whitelisted_players.keys())
+    whitelisted_count = len(whitelisted_players) - removed_whitelist_count
     player_count = total_clients - total_clients_bypassing
     real_client_count = player_count if player_count >= 0 else 0
     available_slots = MAX_PLAYERS - whitelisted_count
