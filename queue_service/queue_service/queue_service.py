@@ -130,18 +130,18 @@ def process_queue():
         print('get_current_clients', clients, status_code, flush=True)
         return
 
-    total_team = 0
+    total_clients = len(clients.keys())
+    total_clients_bypassing = 0
     for k in list(clients.keys()):
         client = clients[k]
-        if client['privLevel'] == 2 or client['privLevel'] == 3:
-            total_team += 1
+        if client['privLevel'] > 1 or client['isTester'] == 1:
+            total_clients_bypassing += 1
             del clients[k]
             continue
         if client["state"] == 6:  # disconnected
             del clients[k]
 
-    total_clients = len(clients.keys())
-    player_count = total_clients - total_team
+    player_count = total_clients - total_clients_bypassing
     player_count = player_count if player_count >= 0 else 0
     available_slots = MAX_PLAYERS - player_count
     available_slots = available_slots if available_slots >= 0 else 0
@@ -203,7 +203,7 @@ def process_queue():
             successfully_whitelisted_count += 1
 
     print('total clients:', total_clients)
-    print('total team clients:', total_team)
+    print('total queue bypassing clients:', total_clients_bypassing)
     print('total player clients:', player_count)
     print('current player cap:', MAX_PLAYERS)
     print('open slots: ', available_slots)
