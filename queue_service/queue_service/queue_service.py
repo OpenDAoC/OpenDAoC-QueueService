@@ -157,7 +157,7 @@ def process_queue():
             del clients[k]
 
     date_now = datetime.now()
-    revoke_time = date_now + timedelta(minutes=1)
+    revoke_time = date_now + timedelta(minutes=5)
     connected_client_name_list = clients.keys()
 
     accounts_reconnected_during_grace = []
