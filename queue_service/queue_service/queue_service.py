@@ -139,8 +139,6 @@ def process_queue():
         print('get_current_clients', clients, status_code, flush=True)
         return
 
-    print(clients, flush=True)
-
     request_whitelisted_players, status = get_whitelist()
     if status != 200:
         print('get_whitelist', status_code, request_whitelisted_players, flush=True)
