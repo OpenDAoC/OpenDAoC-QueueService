@@ -61,7 +61,7 @@ def get_current_clients():
 # Get max_players cap from game server
 def get_queue_length():
     try:
-        r = requests.get(url=api_urls["queue_length"], timeout=10)
+        r = requests.get(url=api_urls["queue_length"], timeout=30)
         if r.status_code != 200:
             return r.text, r.status_code
     except requests.exceptions.RequestException as e:
@@ -75,7 +75,7 @@ def get_queue(length: int):
         data = {
             "length": length
         }
-        r = requests.post(url=api_urls["queue"], json=data, headers=secure_headers(), timeout=10)
+        r = requests.post(url=api_urls["queue"], json=data, headers=secure_headers(), timeout=30)
         if r.status_code != 200:
             return r.text, r.status_code
     except requests.exceptions.RequestException as e:
@@ -86,7 +86,7 @@ def get_queue(length: int):
 # retrieve the whole whitelist
 def get_whitelist():
     try:
-        r = requests.get(url=api_urls["whitelist"], headers=secure_headers(), timeout=10)
+        r = requests.get(url=api_urls["whitelist"], headers=secure_headers(), timeout=30)
         if r.status_code != 200:
             return r.text, r.status_code
     except requests.exceptions.RequestException as e:
@@ -100,7 +100,7 @@ def add_to_whitelist(account: str):
         data = {
             "name": account
         }
-        r = requests.post(url=api_urls["whitelist"], json=data, headers=secure_headers(), timeout=10)
+        r = requests.post(url=api_urls["whitelist"], json=data, headers=secure_headers(), timeout=30)
         if r.status_code != 200:
             return r.text, r.status_code
     except requests.exceptions.RequestException as e:
@@ -115,7 +115,7 @@ def add_revoke_date_to_whitelist(revoke_list: list):
             "users": revoke_list,
             "graceful": False
         }
-        r = requests.put(url=api_urls["whitelist"], json=data, headers=secure_headers(), timeout=10)
+        r = requests.put(url=api_urls["whitelist"], json=data, headers=secure_headers(), timeout=30)
         if r.status_code != 200:
             return r.text, r.status_code
     except requests.exceptions.RequestException as e:

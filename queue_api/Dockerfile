@@ -22,7 +22,7 @@ RUN python3 -m pip install -U pip
 RUN ./install.sh
 RUN mkdir -p /var/log/gunicorn
 
-CMD gunicorn -w 2 \
+CMD gunicorn -w 5 \
     --bind 0.0.0.0:8080 \
     --error-logfile /var/log/gunicorn/error.log \
     --access-logfile /var/log/gunicorn/access.log \
