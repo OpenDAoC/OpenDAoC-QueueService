@@ -38,90 +38,117 @@ def secure_headers():
 
 # Get max_players cap from game server
 def get_max_clients_count():
-    r = requests.get(url=api_urls["game_server_max_clients"])
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        r = requests.get(url=api_urls["game_server_max_clients"], timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
 # Get dictionary of all connected clients from game server (account_name : client_details)
 def get_current_clients():
-    r = requests.get(url=api_urls["game_server_clients"])
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        r = requests.get(url=api_urls["game_server_clients"], timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
 # Get max_players cap from game server
 def get_queue_length():
-    r = requests.get(url=api_urls["queue_length"])
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        r = requests.get(url=api_urls["queue_length"], timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
 # Get list of size @length of accounts at the front of the queue
 def get_queue(length: int):
-    data = {
-        "length": length
-    }
-    r = requests.post(url=api_urls["queue"], json=data, headers=secure_headers())
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        data = {
+            "length": length
+        }
+        r = requests.post(url=api_urls["queue"], json=data, headers=secure_headers(), timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
 # retrieve the whole whitelist
 def get_whitelist():
-    r = requests.get(url=api_urls["whitelist"], headers=secure_headers())
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        r = requests.get(url=api_urls["whitelist"], headers=secure_headers(), timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
 # add an account to the whitelist
 def add_to_whitelist(account: str):
-    data = {
-        "name": account
-    }
-    r = requests.post(url=api_urls["whitelist"], json=data, headers=secure_headers())
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        data = {
+            "name": account
+        }
+        r = requests.post(url=api_urls["whitelist"], json=data, headers=secure_headers(), timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
 # add revocation date to a list of accounts from the whitelist
 def add_revoke_date_to_whitelist(revoke_list: list):
-    data = {
-        "users": revoke_list,
-        "graceful": False
-    }
-    r = requests.put(url=api_urls["whitelist"], json=data, headers=secure_headers())
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        data = {
+            "users": revoke_list,
+            "graceful": False
+        }
+        r = requests.put(url=api_urls["whitelist"], json=data, headers=secure_headers(), timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
 # remove revocation date from a list of accounts from the whitelist
 def remove_revoke_date_from_whitelist(grace_list: list):
-    data = {
-        "users": grace_list,
-        "graceful": True
-    }
-    r = requests.put(url=api_urls["whitelist"], json=data, headers=secure_headers())
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        data = {
+            "users": grace_list,
+            "graceful": True
+        }
+        r = requests.put(url=api_urls["whitelist"], json=data, headers=secure_headers(), timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
 # remove an account from the whitelist
 def remove_from_whitelist(account_list: list):
-    data = {
-        "users": account_list
-    }
-    r = requests.delete(url=api_urls["whitelist"], json=data, headers=secure_headers())
-    if r.status_code != 200:
-        return r.text, r.status_code
+    try:
+        data = {
+            "users": account_list
+        }
+        r = requests.delete(url=api_urls["whitelist"], json=data, headers=secure_headers(), timeout=10)
+        if r.status_code != 200:
+            return r.text, r.status_code
+    except requests.exceptions.RequestException as e:
+        return str(e), 500
     return r.json(), r.status_code
 
 
