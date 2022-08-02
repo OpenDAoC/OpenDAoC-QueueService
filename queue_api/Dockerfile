@@ -28,5 +28,4 @@ CMD gunicorn -w 5 \
     --access-logfile /var/log/gunicorn/access.log \
     --capture-output \
     --log-level debug \
-    --timeout 300 \
     "queue_api.queue_api.app:app"
